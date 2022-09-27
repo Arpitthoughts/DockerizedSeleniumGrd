@@ -1,0 +1,65 @@
+docker image pull selenium/standalone-chrome:latest {to download image from docker hub}
+
+docker container create selenium/standalone-chrome {to create container}
+
+docker container start 3707ada {to start the container}
+
+{pull+create+start} =run (it will pull image create and start container)
+
+docker container ps {to view list of available containers}
+
+docker stop 3707adad6a6f {to stop the container}
+
+docker ps -a {to view docker containers that are stopped}
+
+docker rm 3707adad6a6f {to remove container completely from Docker}
+
+docker container run -d -p 4444:4444 --name selgrid selenium/standalone-chrome  {-d for no logs.. background process} {pull+create+start = run}
+docker container run -d -p [localport]:[containerport] --name selgrid selenium/standalone-chrome 
+
+docker exec -ti  containerid /bin/bash  {t indicates that u want to see output from cmd prompt and i indicates enter output} {command is used to move to container linux shell}
+
+-ti to open shell and execute some commands in containershell
+
+docker images -f "reference=selenium/*:latest"
+
+docker run -d -p 4444:4444 --name selenium-hub selenium/hub:latest
+
+docker run -d --link selenium-hub:hub selenium/node-chrome-debug:latest
+
+docker run -d --link selenium-hub:hub selenium/node-firefox-debug:latest
+
+docker inspect containerid
+--------------------------------------
+
+Container restart policy
+1. What is restart policy?Why it is important?
+2. No(Default)
+3. On-failure(Restart on non zero exit code)
+4. Always(unless docker daemon is stopped)
+5. Unless-stopped(Restarts always except manually stopped
+
+Docker run -- restart<flag>imagename
+Docker update --restart<flag> $(docker ps -q)
+
+exit 0 for successful exit
+exit 1 or any non zero is unsuccessful exit
+
+docker run -ti --restart on-failure:3 busybox
+
+docker update --restart on-failure:2 3566e6753a03
+
+
+docker run -d --link selenium-hub:hub --publish-events tcp://172.17.0.2:4442 --subscribe-events tcp://172.17.0.2:4443I selenium/node-chrome 
+
+docker run -d --net grid -e SE_EVENT_BUS_HOST=selenium-hub --shm-size="2g" -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e SE_EVENT_BUS_SUBSCRIBE_PORT=4443 selenium/node-chrome
+
+
+docker run -d -p 4444:4444 --shm-size="2g" -e SE_EVENT_BUS_HOST=selenium-hub -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e SE_EVENT_BUS_SUBSCRIBE_PORT=4443 -e SE_NODE_HOST=<ip-from-machine-4> selenium/node-chrome
+
+
+file name = docker-compose.yml then cmd -> docker-compose up 
+file name = selenium-compose.yml then cmd-> docker-compose -f selenium-compose.yml up
+
+to scale up a service first bring docker-compose instance down then run below cmd
+docker-compose up --scale chrome=5 
